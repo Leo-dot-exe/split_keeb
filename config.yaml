@@ -1,0 +1,229 @@
+units:
+  kx: u
+  ky: u
+  px: kx + 2
+  py: ky + 2
+
+points:
+  zones:
+    matrix:
+      anchor:
+        shift: [150, -150] # so it looks nice in kicad
+      columns:
+        outer:
+          key:
+            column_net: P14
+        pinky:
+          key:
+            column_net: P16
+        ring:
+          key:
+            column_net: P10
+          key.stagger: 10
+        middle:
+          key:
+            column_net: P9
+          key.stagger: 5
+        index:
+          key:
+            column_net: P8
+          key.stagger: -5
+        inner:
+          key:
+            column_net: P7
+          key.stagger: -5
+      rows:
+        bottom:
+          row_net: P18
+        home:
+          row_net: P19
+        top:
+          row_net: P20
+        num:
+          row_net: P21
+        
+    thumbfan:
+      anchor:
+        ref: matrix_inner_bottom
+        shift: [-44, -25]
+      columns:
+        thumb0:
+          key:
+            column_net: P14
+        thumb1:
+          key:
+            column_net: P16
+        thumb2:
+          key:
+            column_net: P10
+        thumb3:
+          key:
+            column_net: P9
+            spread: 22
+            rotate: -20
+            shift: [0.5, -4]
+        thumb4:
+          key:
+            column_net: P8
+            spread: 0
+            rotate: -20
+            shift: [7, 14]
+        thumb5:
+          key:
+            column_net: P7
+            spread: 24
+            rotate: -40
+            shift: [-4, -15.4]
+      rows:
+        thumb:
+          row_net: P15
+  # mirror: &mirror
+    # ref: matrix_inner_num
+    # distance: 6kx
+
+outlines:
+  _raw:
+    - what: rectangle
+      where: true
+      size: [px, py]
+  _keys:
+    - what: rectangle
+      where: true
+      size: [kx-0.5, ky-0.5]
+  _board:
+    - what: polygon
+      fillet: 2
+      points:
+        - ref: matrix_outer_num
+          shift: [-0.6kx, 0.6ky]
+
+        - ref: matrix_ring_num
+          shift: [-0.6kx, 1.4] # IDK why this has to be different ¯\_(ツ)_/¯
+        - ref: matrix_ring_num
+          shift: [-0.6kx, 0.6ky]
+        - ref: matrix_ring_num
+          shift: [0.4kx, 0.6ky]
+
+        - ref: matrix_middle_num
+          shift: [-0.6kx, 0.6ky]
+        - ref: matrix_middle_num
+          shift: [0.6kx, 0.6ky]
+
+        - ref: matrix_index_num
+          shift: [-0.4kx, 0.6ky]
+        - ref: matrix_index_num
+          shift: [0.6kx, 0.6ky]
+
+        - ref: matrix_inner_num
+          shift: [-0.4kx, 0.6ky]
+        - ref: matrix_inner_num
+          shift: [1.9kx, 0.6ky]
+        
+        - ref: matrix_inner_home
+          shift: [1.9kx, -1ky]
+
+        - ref: thumbfan_thumb5_thumb
+          shift: [0.6kx, 0.6ky]
+        - ref: thumbfan_thumb5_thumb
+          shift: [0.6kx, -0.6ky]
+        
+        - ref: thumbfan_thumb2_thumb
+          shift: [0kx, -0.6ky]
+
+        - ref: thumbfan_thumb0_thumb
+          shift: [-0.6kx, -0.6ky]
+        
+        - ref: matrix_outer_bottom
+          shift: [-0.6kx, -0.6ky]
+  preview:
+    - what: outline
+      name: _board
+      operation: stack
+    - what: outline
+      name: _keys
+      operation: stack
+
+pcbs:
+  pcb:
+    outlines:
+      main:
+        outline: _board
+    footprints:
+      # Switches
+      mx:
+        what: mx
+        where: true
+        params:
+          reverse: true
+          keycaps: true
+          hotswap: true
+          from: "{{column_net}}"
+          to: "{{colrow}}"
+      # Diode for each switch
+      diode:
+        what: diode
+        where: true
+        params:
+          from: "{{colrow}}"
+          to: "{{row_net}}"
+        adjust:
+          shift: [0, -5]
+      # Micro controller
+      promicro:
+        what: promicro
+        params:
+          orientation: "down"
+        where:
+          ref: matrix_inner_top
+          shift: [1.2kx, 0ky]
+          rotate: -90
+      # Reset btn
+      reset:
+        what: button
+        params:
+          from: GND
+          to: RST
+        where:
+          ref: matrix_inner_top
+          shift: [16, -24]
+          rotate: -90
+      # Connecter
+      trrs:
+        what: trrs
+        params:
+          reverse: true
+          A: GND
+          B: VCC
+          C: P0
+          D: P1
+        where:
+          ref: matrix_inner_top
+          shift: [34, -26]
+          rotate: -90
+      # Mounting holes
+      holeTopLeft:
+        what: mountinghole
+        where:
+          ref: matrix_outer_num
+          shift: [0.5kx, -0.5ky]
+      holeTopRight:
+        what: mountinghole
+        where:
+          ref: matrix_index_num
+          shift: [0.5kx, -0.5ky]
+      holeBottomLeft:
+        what: mountinghole
+        where:
+          ref: matrix_outer_home
+          shift: [0.5kx, -0.5ky]
+      holeBottomRight:
+        what: mountinghole
+        where:
+          ref: matrix_index_home
+          shift: [0.5kx, -0.5ky]
+      holeMatrix:
+        what: mountinghole
+        where:
+          ref: thumbfan_thumb4_thumb
+          shift: [0.5kx, -0.5ky]
+
