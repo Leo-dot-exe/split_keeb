@@ -90,7 +90,7 @@ outlines:
     - what: rectangle
       where: true
       size: [kx-0.5, ky-0.5]
-  _board:
+  _board: # Main outline
     - what: polygon
       fillet: 2
       points:
@@ -159,15 +159,26 @@ pcbs:
           hotswap: true
           from: "{{column_net}}"
           to: "{{colrow}}"
-      # Diode for each switch
-      diode:
+      # Diodes in normal orientation (bottom, top rows)
+      diode_normal:
         what: diode
         where: true
         params:
           from: "{{colrow}}"
           to: "{{row_net}}"
         adjust:
-          shift: [0, -5]
+          shift: [-4, -5]
+          rotate: 90
+
+      # Diode for each switch
+      # diode:
+        # what: diode
+        # where: true
+        # params:
+          # from: "{{colrow}}"
+          # to: "{{row_net}}"
+        # adjust:
+          # shift: [0, -5]
       # Micro controller
       promicro:
         what: promicro
